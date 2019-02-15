@@ -9,15 +9,20 @@ from rest_framework.authtoken.models import Token
 from .renderers import UserJSONRenderer
 from rest_framework import authentication, permissions
 from rest_framework.authtoken.models import Token
-
 from .serializers import (
 LoginSerializer, 
 RegistrationSerializer,
+RegisterArtistSerializer,
+RegisterManagerSerializer,
+RegisterRecordLabelSerializer,
+UserSerializer,
 PasswordResetSerializer,
 PasswordResetVerifiedSerializer,
-PasswordChangeSerializer,
+PasswordChangeSerializer
 
 )
+
+from .models import User
 
 class CustomAuthToken(views.ObtainAuthToken):
 
@@ -36,7 +41,7 @@ class CustomAuthToken(views.ObtainAuthToken):
             "token": token.key,
             "user" : {
                 # "user_id": user.pk,
-                "id":user.id,
+                "id":user.pk,
                 # "space_admin": user_space.is_space_admin,
                 # "space_type": user.space_type.id,
                 "username": user.username,
@@ -51,24 +56,109 @@ class RegistrationAPIView(APIView):
     serializer_class = RegistrationSerializer
 
     def post(self, request):
-        user = request.data.get('user', {})
-        serializer = self.serializer_class(data=user)
+        # user = request.data.get('user', {})
+        # serializer = self.serializer_class(data=user)
+        serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-class LoginAPIView(APIView):
+
+class RegisterArtistAPIView(APIView):
+    # Allow any user (authenticated or not) to hit this endpoint.
     permission_classes = (AllowAny,)
     # renderer_classes = (UserJSONRenderer,)
-    serializer_class = LoginSerializer
+    serializer_class = RegisterArtistSerializer
 
     def post(self, request):
-        user = request.data.get('user', {})
-        serializer = self.serializer_class(data=user)
+        # user = request.data.get('user', {})
+        # serializer = self.serializer_class(data=request.data)
+        serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
+        serializer.save()
 
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+class RegisterRecordLabelAPIView(APIView):
+    # Allow any user (authenticated or not) to hit this endpoint.
+    permission_classes = (AllowAny,)
+    # renderer_classes = (UserJSONRenderer,)
+    serializer_class = RegisterManagerSerializer
+
+    def post(self, request):
+        # user = request.data.get('user', {})
+        # serializer = self.serializer_class(data=request.data)
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+class RegisterManagerAPIView(APIView):
+    # Allow any user (authenticated or not) to hit this endpoint.
+    permission_classes = (AllowAny,)
+    # renderer_classes = (UserJSONRenderer,)
+    serializer_class = RegisterManagerSerializer
+
+    def post(self, request):
+        # user = request.data.get('user', {})
+        # serializer = self.serializer_class(data=request.data)
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+class UserView(viewsets.ModelViewSet):
+    permission_classes = (AllowAny,)
+     # permission_classes = (IsAuthenticated,)
+    queryset   = User.objects.all()
+    serializer_class = UserSerializer
+
+
+# class ProfileView(viewsets.ModelViewSet):
+#     queryset   = Profile.objects.all()
+#     serializer_class = ProfileSerializer
+
+# class UserRetrieveUpdateAPIView(RetrieveUpdateAPIView):
+#     # permission_classes = (IsAuthenticated,)
+#     permission_classes = (AllowAny,)
+#     # renderer_classes = (UserJSONRenderer,)
+#     serializer_class = UserSerializer
+
+#     def retrieve(self, request, *args, **kwargs):
+     
+#         serializer = self.serializer_class(request.user)
+
+#         return Response(serializer.data, status=status.HTTP_200_OK)
+
+#     def update(self, request, *args, **kwargs):
+#         serializer_data = request.data.get('user', {})
+
+#         # Here is that serialize, validate, save pattern we talked about
+#         # before.
+#         serializer = self.serializer_class(
+#             request.user, data=serializer_data, partial=True
+#         )
+#         serializer.is_valid(raise_exception=True)
+#         serializer.save()
+
+#         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+
+# class LoginAPIView(APIView):
+#     permission_classes = (AllowAny,)
+#     # renderer_classes = (UserJSONRenderer,)
+#     serializer_class = LoginSerializer
+
+#     def post(self, request):
+#         # user = request.data.get('user', {})
+#         # serializer = self.serializer_class(data=user)
+#         serializer = self.serializer_class(data=request.data)
+#         serializer.is_valid(raise_exception=True)
+
+#         return Response(serializer.data, status=status.HTTP_200_OK)
 
 # class UserView(viewsets.ModelViewSet):
 #     queryset   = User.objects.all()

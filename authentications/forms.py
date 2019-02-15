@@ -1,4 +1,4 @@
-from vibe_user.models import User
+from authentications.models import User
 from django import forms
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _

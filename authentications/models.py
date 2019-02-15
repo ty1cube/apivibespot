@@ -4,6 +4,8 @@ from django.conf import settings
 from django.core.mail.message import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.core.mail import send_mail
+from django.dispatch import receiver
+from django.db.models.signals import post_save
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import (
     AbstractBaseUser, BaseUserManager, PermissionsMixin
@@ -13,7 +15,12 @@ from django.db import models
 import uuid
 
 def upload_image(instance, filename):
-    return "profile/{user}/{filename}".format(user=instance.user, filename=filename)
+    return "files/{unique_id}/images/profile/{filename}".format(unique_id=instance.unique_id, filename=filename)
+
+
+# def upload_image(instance, filename):
+#     return 'user_{0}/{1}'.format(instance.user.id, filename)
+
 
 class UserManager(BaseUserManager):
     def create_user(self, username, email,user_type=None, phone = None,image=None, wallet=None, previous_wallet=None, email_verified=None, 
@@ -62,7 +69,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     email                       = models.EmailField(max_length=100, unique=True)
     user_type                   = models.PositiveSmallIntegerField(blank=True, null=True)
     phone                       = models.CharField(max_length=15,blank=True, null=True)
-    image                       = models.ImageField(upload_to=upload_image, blank=True, null=True)
+    image                       = models.ImageField(upload_to = upload_image, blank=True, null=True)
     wallet                      = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
     previous_wallet             = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
     email_verified              = models.BooleanField(default=False,blank=True, null=True)
@@ -93,7 +100,6 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     # @property
     # def token(self):
-
     #     return self._generate_jwt_token()
 
     def get_full_name(self):
@@ -147,6 +153,25 @@ class ArtistProfile(models.Model):
 
     def __str__(self):
         return self.user.username
+    
+    # @receiver(post_save, sender=User)
+    # def create_profile_for_user(sender, instance=None, created=False, **kargs):
+    #     if created:
+    #         UserProfile.objects.get_or_create(user=instance)
+
+# @receiver(post_save, sender=User)
+# def create_artist_profile(sender, instance, created, **kwargs):
+#     if created:
+#         profile = ArtistProfile(user=instance)
+#         profile.save()
+
+
+# @receiver(post_save, sender=User)
+# def create_artist_profile(sender, instance, created, **kwargs):
+#     if created:
+#         ArtistProfile.objects.create(user=instance)
+#     instance.artistprofile.save()
+
 
 class UserProfile(models.Model):
     # id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) 
@@ -168,7 +193,7 @@ class UserProfile(models.Model):
 class RecordLabelProfile(models.Model):
     # id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) 
     # user_id = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    user  = models.OneToOneField('authentications.User', on_delete=models.CASCADE)
+    user  = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     record_label_name = models.CharField(max_length=100, null=True )
     created_at = models.DateTimeField(auto_now_add=True)
     
@@ -196,58 +221,58 @@ class ManagementProfile(models.Model):
 def _generate_code():
     return uuid.uuid1(20)
 
-class AbstractBaseCode(models.Model):
-    # id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) 
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    code = models.CharField(_('code'), max_length=60, default="")
-    created_at = models.DateTimeField(auto_now_add=True)
+# class AbstractBaseCode(models.Model):
+#     # id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) 
+#     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+#     code = models.CharField(_('code'), max_length=60, default="")
+#     created_at = models.DateTimeField(auto_now_add=True)
 
-    class Meta:
-        abstract = True
+#     class Meta:
+#         abstract = True
 
-    def send_email(self, prefix):
-        ctxt = {
-            'email': self.user.email,
-            # 'first_name': self.user.first_name,
-            # 'last_name': self.user.last_name,
-            'code': self.code
-        }
-        send_multi_format_email(prefix, ctxt, target_email=self.user.email)
+#     # def send_email(self, prefix):
+#     #     ctxt = {
+#     #         'email': self.user.email,
+#     #         # 'first_name': self.user.first_name,
+#     #         # 'last_name': self.user.last_name,
+#     #         'code': self.code
+#     #     }
+#     #     send_multi_format_email(prefix, ctxt, target_email=self.user.email)
 
-    def __str__(self):
-        return self.code
-
-
-class SignupCodeManager(models.Manager):
-    def create_signup_code(self, user, ipaddr):
-        code = _generate_code()
-        if not ipaddr:
-            ipaddr = "0.0.0.0"
-        signup_code = self.create(user=user, code=code, ipaddr=ipaddr)
-
-        return signup_code
-
-    def set_user_is_verified(self, code):
-        try:
-            signup_code = SignupCode.objects.get(code=code)
-            signup_code.user.is_verified = True
-            signup_code.user.save()
-            return True
-        except SignupCode.DoesNotExist:
-            pass
-        return False
+#     def __str__(self):
+#         return self.code
 
 
-class SignupCode(AbstractBaseCode):
-    ipaddr = models.GenericIPAddressField(_('ip address'),default='0.0.0.0')
-    objects = SignupCodeManager()
+# class SignupCodeManager(models.Manager):
+#     def create_signup_code(self, user, ipaddr):
+#         code = _generate_code()
+#         if not ipaddr:
+#             ipaddr = "0.0.0.0"
+#         signup_code = self.create(user=user, code=code, ipaddr=ipaddr)
 
-    class Meta:
-        db_table = 'signupcode'
+#         return signup_code
+
+#     def set_user_is_verified(self, code):
+#         try:
+#             signup_code = SignupCode.objects.get(code=code)
+#             signup_code.user.is_verified = True
+#             signup_code.user.save()
+#             return True
+#         except SignupCode.DoesNotExist:
+#             pass
+#         return False
+
+
+# class SignupCode(AbstractBaseCode):
+#     ipaddr = models.GenericIPAddressField(_('ip address'),default='0.0.0.0')
+#     objects = SignupCodeManager()
+
+#     class Meta:
+#         db_table = 'signupcode'
     
-    def send_signup_email(self):
-        prefix = 'signup_email'
-        self.send_email(prefix)
+    # def send_signup_email(self):
+    #     prefix = 'signup_email'
+    #     self.send_email(prefix)
 
 
 class PasswordResetCodeManager(models.Manager):
@@ -274,7 +299,7 @@ def send_multi_format_email(template_prefix, template_ctxt, target_email):
     msg.send()
 
 
-class PasswordResetCode(AbstractBaseCode):
+class PasswordResetCode(models.Model):
     objects = PasswordResetCodeManager()
 
     class Meta:

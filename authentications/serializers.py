@@ -13,103 +13,21 @@ from . models import(
 # from .models import User, Profile
 
 
-class BaseSignupSerializer():
-    email = serializers.EmailField(
-            required=True,
-            validators=[UniqueValidator(queryset=User.objects.all())]
-            )
-    username = serializers.CharField(
-            required=True,
-            validators=[UniqueValidator(queryset=User.objects.all())]
-            )
-
-
-    def create(self, validated_data):
-        user = User.objects.create_user(
-                validated_data['username'], 
-                validated_data['email'],
-                validated_data['password']
-                )
-        return user
-
-    class Meta:
-        model = User
-        fields = ('id', 'username', 'email', 'password')
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
-
     password = serializers.CharField(required=True,min_length=8)
     token = serializers.CharField(max_length=255, read_only=True)
 
     class Meta:
         model  = User 
-        # fields = ("id", "username", "email", "password", "token")
-        fields = "__all__"
+        fields = ("id", "username", "email", "password", "token")
+        # fields = "__all__"
         read_only_field = ("created_at", "updated_at")
 
     def create(self, validated_data):
         # Use the `create_user` method we wrote earlier to create a new user.
         return User.objects.create_user(**validated_data)
-
-
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model  = User 
-        fields = ("id", "username", "email")
-
-
-class ArtistProfileSerializer(serializers.ModelSerializer):
-
-    user = UserSerializer();
-    class Meta:
-        model  = ArtistProfile
-        fields = "__all__"
-        # fields = ("id", "username", "email")
-        read_only_fields = ("created_at", "updated_at")
-
-class ManagementProfileSerializer(serializers.ModelSerializer):
-
-    user = UserSerializer();
-
-    class Meta:
-        model  = ManagementProfile
-        fields = "__all__"
-        # fields = ("id", "username", "email")
-        read_only_fields = ("created_at", "updated_at")
-
-class RecordLabelProfileSerializer(serializers.ModelSerializer):
-
-    user = UserSerializer();
-
-    class Meta:
-        model  = RecordLabelProfile
-        fields = "__all__"
-        # fields = ("id", "username", "email")
-        read_only_fields = ("created_at", "updated_at")
-
-
-class UserProfileSerializer(serializers.ModelSerializer):
-
-    user = UserSerializer();
-    class Meta:
-        model  = UserProfile
-        fields = "__all__"
-        # fields = ("id", "username", "email")
-        read_only_fields = ("created_at", "updated_at")
-
-
-class PasswordResetSerializer(serializers.Serializer):
-    email = serializers.EmailField(max_length=255)
-
-
-class PasswordResetVerifiedSerializer(serializers.Serializer):
-    code = serializers.CharField(max_length=100)
-    password = serializers.CharField(max_length=128)
-
-
-class PasswordChangeSerializer(serializers.Serializer):
-    password = serializers.CharField(max_length=128)
 
 
 class LoginSerializer(serializers.Serializer):
@@ -154,30 +72,197 @@ class LoginSerializer(serializers.Serializer):
         
 
 # class UserSerializer(serializers.ModelSerializer):
-#     password = serializers.CharField(
-#         max_length=128,
-#         min_length=8,
-#         write_only=True
-#     )
+#     password = serializers.CharField(max_length=128, min_length=8, write_only=True)
+
 
 #     class Meta:
 #         model = User
-#         fields = ('email', 'username', 'password', 'token',)
-#         read_only_fields = ('token',)
-
+#         fields = "__all__"
+#         # fields = ('email', 'username', 'password', 'token',)
+#         read_only_fields = ('created_at',)
 
 #     def update(self, instance, validated_data):
 #         """Performs an update on a User."""
-
 #         password = validated_data.pop('password', None)
 
 #         for (key, value) in validated_data.items():
-
 #             setattr(instance, key, value)
 
-#         if password is not None:     
+#         if password is not None:
 #             instance.set_password(password)
 
 #         instance.save()
 
 #         return instance
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model  = User 
+        fields = "__all__"
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+
+    user = UserSerializer();
+
+    class Meta:
+        model  = ArtistProfile
+        fields = "__all__"
+        # fields = ("id", "username", "email")
+        read_only_fields = ("created_on", "updated_on")
+
+class ArtistProfileSerializer(serializers.ModelSerializer):
+    # user = UserSerializer();
+    class Meta:
+        model  = ArtistProfile
+        fields = "__all__"
+        # fields = ("id", "username", "email")
+        read_only_fields = ("created_at", "updated_at")
+
+    
+        
+class RegisterArtistSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(required=True,min_length=8)
+    token = serializers.CharField(max_length=255, read_only=True)
+    # artist_profile = ArtistProfileSerializer(required=False)
+    # artist_profile = ArtistProfileSerializer(required=False)
+    # userprofile = UserProfileSerializer(required=False)
+
+    class Meta:
+        model  = User 
+        fields = ("id", "username", "email", "password", "token")
+        # fields = "__all__"
+        read_only_field = ("created_at", "updated_at")
+
+    def create(self, validated_data):
+        # Use the `create_user` method we wrote earlier to create a new user.
+        return User.objects.create_user(**validated_data)
+
+
+    # def create(self, validated_data):
+    #     artist_profile_data = validated_data.pop('artist_profile')
+    #     user = User.objects.create_user(**validated_data)
+    #     ArtistProfile.objects.create_user(**artist_profile_data)
+    #     return user
+
+    # def create_profile(self, validated_data, instance=None):
+    #     profile_data = validated_data.pop('artist_profile')
+    #     user = User.objects.create(**validated_data)
+    #     user.set_password(validated_data['password'])
+    #     user.save()
+    #     ArtistProfile.objects.update_or_create(user=user,**profile_data)
+    #     return user
+    # def create(self, validated_data, instance=None):
+    #     artist_profile_data = validated_data.pop('artistprofile')
+    #     user = User.objects.create_user(**validated_data)
+    #     user.set_password(validated_data['password'])
+    #     user.save()
+    #     ArtistProfile.objects.update_or_create(user=user,**artist_profile_data)
+    #     return user
+
+
+class RegisterRecordLabelSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(required=True,min_length=8)
+    token = serializers.CharField(max_length=255, read_only=True)
+
+    class Meta:
+        model  = User 
+        fields = ("id", "username", "email", "password", "token")
+        # fields = "__all__"
+        read_only_field = ("created_at", "updated_at")
+
+    def create(self, validated_data):
+        # Use the `create_user` method we wrote earlier to create a new user.
+        return User.objects.create_user(**validated_data)
+
+
+
+class RegisterManagerSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(required=True,min_length=8)
+    token = serializers.CharField(max_length=255, read_only=True)
+
+    class Meta:
+        model  = User 
+        fields = ("id", "username", "email", "password", "token")
+        # fields = "__all__"
+        read_only_field = ("created_at", "updated_at")
+
+    def create(self, validated_data):
+        # Use the `create_user` method we wrote earlier to create a new user.
+        return User.objects.create_user(**validated_data)
+
+# class UserSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model  = User 
+#         fields = ("id", "username", "email")
+
+
+# class ArtistProfileSerializer(serializers.ModelSerializer):
+#     # user = UserSerializer();
+#     class Meta:
+#         model  = ArtistProfile
+#         fields = "__all__"
+#         # fields = ("id", "username", "email")
+#         read_only_fields = ("created_at", "updated_at")
+
+
+class ManagementProfileSerializer(serializers.ModelSerializer):
+    user = UserSerializer();
+
+    class Meta:
+        model  = ManagementProfile
+        fields = "__all__"
+        # fields = ("id", "username", "email")
+        read_only_fields = ("created_at", "updated_at")
+
+class RecordLabelProfileSerializer(serializers.ModelSerializer):
+
+    user = UserSerializer();
+
+    class Meta:
+        model  = RecordLabelProfile
+        fields = "__all__"
+        # fields = ("id", "username", "email")
+        read_only_fields = ("created_at", "updated_at")
+
+
+class UserProfileSerializer(serializers.ModelSerializer):
+
+    user = UserSerializer();
+    class Meta:
+        model  = UserProfile
+        fields = "__all__"
+        # fields = ("id", "username", "email")
+        read_only_fields = ("created_at", "updated_at")
+
+
+class PasswordResetSerializer(serializers.Serializer):
+    email = serializers.EmailField(max_length=255)
+
+
+class PasswordResetVerifiedSerializer(serializers.Serializer):
+    code = serializers.CharField(max_length=100)
+    password = serializers.CharField(max_length=128)
+
+
+class PasswordChangeSerializer(serializers.Serializer):
+    password = serializers.CharField(max_length=128)
+
+
+
+
+
+
+    # def update(self, instance, validated_data):
+    #     """Performs an update on a User."""
+
+    #     password = validated_data.pop('password', None)
+    #     for (key, value) in validated_data.items():
+    #         setattr(instance, key, value)
+
+    #     if password is not None:     
+    #         instance.set_password(password)
+
+    #     instance.save()
+
+    #     return instance

@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'debug_toolbar',
 
     'rest_framework',
     'rest_framework.authtoken',
@@ -73,14 +74,17 @@ CORS_ORIGIN_WHITELIST = (
 )
 
 MIDDLEWARE = [
+
     'django.middleware.security.SecurityMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
 ]
 
 ROOT_URLCONF = 'vibespot.urls'
@@ -153,8 +157,17 @@ USE_TZ = True
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-STATICFILES_DIRS = (
-    os.path.join(os.path.join(BASE_DIR, 'build'), 'static'),
-)
+# STATICFILES_DIRS = (
+#     os.path.join(os.path.join(BASE_DIR, 'build'), 'static'),
+# )
 
 STATIC_URL = '/static/'
+
+# Media file handling
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'assets')
+MEDIA_URL = '/assets/'
+
+INTERNAL_IPS = ('127.0.0.1', 'localhost',)
+# INTERNAL_IPS = ['127.0.0.1',]

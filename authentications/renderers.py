@@ -1,12 +1,15 @@
 
-from .home_renderer.renderers import HomeJSONRenderer
+# from .home_renderer.renderers import HomeJSONRenderer
+
+import json
+from rest_framework.renderers import JSONRenderer
 
 
-class ProfileJSONRenderer(HomeJSONRenderer):
-    object_label = 'profile'
+# class ProfileJSONRenderer(HomeJSONRenderer):
+#     object_label = 'profile'
 
 
-class UserJSONRenderer(HomeJSONRenderer):
+class UserJSONRenderer(JSONRenderer):
     charset = 'utf-8'
 
     def render(self, data, media_type=None, renderer_context=None):
@@ -22,8 +25,8 @@ class UserJSONRenderer(HomeJSONRenderer):
         token = data.get('token', None)
 
       #  if errors is not None:
-            # As mentioned about, we will let the default JSONRenderer handle
-            # rendering errors.
+        # As mentioned about, we will let the default JSONRenderer handle
+        # rendering errors.
        #     return super(UserJSONRenderer, self).render(data)
 
         if token is not None and isinstance(token, bytes):
@@ -32,6 +35,6 @@ class UserJSONRenderer(HomeJSONRenderer):
             data['token'] = token.decode('utf-8')
 
         # Finally, we can render our data under the "user" namespace.
-        #return json.dumps({
-         #   'user': data
-       # })
+        return json.dumps({
+            'user': data
+        })
