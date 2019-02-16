@@ -122,9 +122,9 @@ WSGI_APPLICATION = 'vibespot.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'vibespotdatabase',
-        'USER': 'vibespot',
-        'PASSWORD': 'Vibespot@Intemporel2018',
+        'NAME': 'vibespotartist',
+        'USER': 'vibeartist',
+        'PASSWORD': 'vibespotArtist@2019',
         'HOST': 'localhost',
         'PORT': '',    
         }
