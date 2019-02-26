@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from authentications.const_models import (
-    Country,
     State,
     LocalArea
 )

@@ -49,10 +49,10 @@ urlpatterns = [
 
     path('', include(router.urls)),
 
-    path('country/', const_views.CountryView.as_view()),
+#     path('country/', const_views.CountryView.as_view()),
     path('state/', const_views.StateView.as_view()),
-    path('state/<int:pk>/', const_views.StateDetailAPIView.as_view(),
-         name='statedetail'),
+#     path('state/<int:pk>/', const_views.StateDetailAPIView.as_view(),
+#          name='statedetail'),
     path('localarea/', const_views.LocalAreaView.as_view()),
     path('localarea/<int:pk>/',
          const_views.LocalAreaDetailAPIView.as_view(), name='localdetail'),

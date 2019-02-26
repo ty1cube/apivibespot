@@ -4,7 +4,6 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from authentications.models import User
 from authentications.const_models import (
-    Country,
     State,
     LocalArea
 )
@@ -49,14 +48,16 @@ class SongList(models.Model):
 
     # email                       = models.EmailField(max_length=100, unique=True, blank=True, null=True)
     genre                       = models.CharField(max_length=50, blank=True, null=True)
-    country                     = models.ForeignKey("authentications.Country", on_delete=models.CASCADE, blank=True, null=True)
-    # vibe_state                  = models.ForeignKey("authentications.State", on_delete=models.CASCADE, blank=True, null=True)
-    push_state                  = models.ForeignKey("authentications.State", on_delete=models.CASCADE, blank=True, null=True)
+    # country                     = models.ForeignKey("authentications.Country", on_delete=models.CASCADE, blank=True, null=True)
+    vibe_state                  = models.ForeignKey("authentications.State", related_name='vibestate', on_delete=models.CASCADE, blank=True, null=True)
+    push_state                  = models.ForeignKey("authentications.State", related_name='pushstate', on_delete=models.CASCADE, blank=True, null=True)
     push_city                   = models.ForeignKey("authentications.LocalArea", on_delete=models.CASCADE, blank=True, null=True)
     release_date                = models.DateTimeField(auto_now_add=True)
 
-    image                       = models.ImageField(upload_to=upload_song_image, blank=True, null=True)
-    song                        =models.FileField(upload_to=upload_singles , blank=True, null=True)
+    # image                       = models.ImageField(upload_to=upload_song_image, blank=True, null=True)
+    # song                        =models.FileField(upload_to=upload_singles , blank=True, null=True)
+    image                       = models.ImageField(upload_to='images/', blank=True, null=True)
+    song                        =models.FileField(upload_to='track/' , blank=True, null=True)
 
     duration	                = models.CharField(max_length = 10, blank=True, null=True )	
     stream	                    = models.IntegerField(default = 0, blank=True, null=True) 
