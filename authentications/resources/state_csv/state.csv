@@ -1,37 +1,38 @@
-1,Abia,1
-2,Adamawa,1
-3,Akwa Ibom,1
-4,Anambra,1
-5,Bauchi,1
-6,Bayelsa,1
-7,Benue,1
-8,Borno,1
-9,Cross River,1
-10,Delta,1
-11,Ebonyi,1
-12,Edo,1
-13,Ekiti,1
-14,Enugu,1
-15,Federal Capital Teritorry,1
-16,Gombe,1
-17,Imo,1
-18,Jigawa,1
-19,Kaduna,1
-20,Kano,1
-21,Katsina,1
-22,Kebbi,1
-23,Kogi,1
-24,Kwara,1
-25,Lagos,1
-26,Nasarawa,1
-27,Niger,1
-28,Ogun,1
-29,Ondo,1
-30,Osun,1
-31,Oyo,1
-32,Plateau,1
-33,Rivers,1
-34,Sokoto,1
-35,Taraba,1
-36,Yobe,1
-37,Zamfara,1
+id,name
+1,Abia
+2,Adamawa
+3,Akwa Ibom
+4,Anambra
+5,Bauchi
+6,Benue
+7,Borno
+8,Bayelsa
+9,Cross River
+10,Delta
+11,Ebonyi
+12,Edo
+13,Ekiti
+14,Enugu
+15,Federal Capital Territory
+16,Gombe
+17,Jigawa
+18,Imo
+19,Kaduna
+20,Kebbi
+21,Kano
+22,Kogi
+23,Lagos
+24,Katsina
+25,Kwara
+26,Nasarawa
+27,Niger
+28,Ogun
+29,Ondo
+30,Rivers
+31,Oyo
+32,Osun
+33,Sokoto
+34,Plateau
+35,Taraba
+36,Yobe
+37,Zamfara

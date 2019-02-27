@@ -33,30 +33,30 @@ class Command(BaseCommand):
                         msg = "\n\nSomething went wrong saving this {}: {}\n{}".format(label, id, str(ex))
                         print(msg)
 
-    def import_country_from_file(self):
-        data_folder = os.path.join(settings.BASE_DIR, 'authentications', 'resources/country_csv')
-        for data_file in os.listdir(data_folder):
-            with open(os.path.join(data_folder, data_file), encoding='utf-8') as data_file:
-                data = csv.reader(data_file)
-                for data_object in data:
-                    id = data_object[0]
-                    name = data_object[1]
+    # def import_country_from_file(self):
+    #     data_folder = os.path.join(settings.BASE_DIR, 'authentications', 'resources/country_csv')
+    #     for data_file in os.listdir(data_folder):
+    #         with open(os.path.join(data_folder, data_file), encoding='utf-8') as data_file:
+    #             data = csv.reader(data_file)
+    #             for data_object in data:
+    #                 id = data_object[0]
+    #                 name = data_object[1]
                   
  
-                    try:
-                        country, created = const_models.Country.objects.get_or_create(
-                                id=id,
-                                name=name,
+    #                 try:
+    #                     country, created = const_models.Country.objects.get_or_create(
+    #                             id=id,
+    #                             name=name,
                               
-                            )
-                        if created:
-                            country.save()
-                            display_format = "\nCountry, {}, has been saved."
-                            print(display_format.format(country))
-                    except Exception as ex:
-                        print(str(ex))
-                        msg = "\n\nSomething went wrong saving this country: {}\n{}".format(id, str(ex))
-                        print(msg)
+    #                         )
+    #                     if created:
+    #                         country.save()
+    #                         display_format = "\nCountry, {}, has been saved."
+    #                         print(display_format.format(country))
+    #                 except Exception as ex:
+    #                     print(str(ex))
+    #                     msg = "\n\nSomething went wrong saving this country: {}\n{}".format(id, str(ex))
+    #                     print(msg)
 
     def import_state_from_file(self):
         data_folder = os.path.join(settings.BASE_DIR, 'authentications', 'resources/state_csv')
@@ -66,13 +66,13 @@ class Command(BaseCommand):
                 for data_object in data:
                     id = data_object[0]
                     name = data_object[1]
-                    country_id = data_object[2]
+                    # country_id = data_object[2]
                   
                     try:
                         state, created = const_models.State.objects.get_or_create(
                                 id=id,
                                 name=name,
-                                country_id=country_id,
+                                # country_id=country_id,
                                 
                               
                             )
@@ -121,7 +121,7 @@ class Command(BaseCommand):
         Call the function to import data
         """
         # self.import_member_type_from_file()
-        self.import_country_from_file()
+        # self.import_country_from_file()
         self.import_state_from_file()
         self.import_local_from_file()
 
