@@ -98,9 +98,9 @@ class User(AbstractBaseUser, PermissionsMixin):
             return "User does not exist"
         return self.username
 
-    # @property
-    # def token(self):
-    #     return self._generate_jwt_token()
+    @property
+    def token(self):
+        return self._generate_jwt_token()
 
     def get_full_name(self):
         # The user is identified by their username
@@ -124,17 +124,17 @@ class User(AbstractBaseUser, PermissionsMixin):
         # Simplest possible answer: Yes, always
         return True
 
-    # def _generate_jwt_token(self):
-    #     dt = datetime.now() + timedelta(days=60)
+    def _generate_jwt_token(self):
+        dt = datetime.now() + timedelta(days=60)
 
-    #     token = jwt.encode({
-    #         'id': self.pk,
-    #         'username': self.username,
-    #         'email': self.email,
-    #         'isAuth': True,
-    #     }, settings.SECRET_KEY, algorithm='HS256')
+        token = jwt.encode({
+            'id': self.pk,
+            'username': self.username,
+            'email': self.email,
+            'isAuth': True,
+        }, settings.SECRET_KEY, algorithm='HS256')
 
-    #     return token.decode('utf-8')
+        return token.decode('utf-8')
 
 
 class ArtistProfile(models.Model):
@@ -144,8 +144,6 @@ class ArtistProfile(models.Model):
     surname = models.CharField(max_length=100, null=True )
     firstname = models.CharField(max_length=100, null=True)
     othernames = models.CharField(max_length=100, null=True)
-    # record_label_id =  models.IntegerField()
-    # management_id = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:
@@ -304,6 +302,7 @@ class PasswordResetCode(models.Model):
 
     class Meta:
         db_table = 'passwordresetcode'
+
     def send_password_reset_email(self):
         prefix = 'password_reset_email'
         self.send_email(prefix)

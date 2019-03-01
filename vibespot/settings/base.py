@@ -48,9 +48,10 @@ AUTH_USER_MODEL = 'authentications.User'
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
         # 'authentications.backends.JWTAuthentication',
-        # 'rest_framework.authentication.SessionAuthentication',
-        # 'rest_framework.authentication.BasicAuthentication'
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
@@ -172,3 +173,6 @@ MEDIA_URL = '/assets/'
 
 INTERNAL_IPS = ('127.0.0.1', 'localhost',)
 # INTERNAL_IPS = ['127.0.0.1',]
+
+
+from vibespot.restconf.main import *

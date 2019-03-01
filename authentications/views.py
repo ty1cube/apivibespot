@@ -7,6 +7,7 @@ from rest_framework.views import APIView
 from rest_framework.authtoken import views 
 from rest_framework.authtoken.models import Token
 from .renderers import UserJSONRenderer
+from django.db.models import Q
 from rest_framework import authentication, permissions
 from rest_framework.authtoken.models import Token
 from .serializers import (
@@ -22,35 +23,43 @@ PasswordChangeSerializer
 
 )
 
+from rest_framework_jwt.settings import api_settings
+
 from .models import User
 
-class CustomAuthToken(views.ObtainAuthToken):
+jwt_payload_handler             = api_settings.JWT_PAYLOAD_HANDLER
+jwt_encode_handler              = api_settings.JWT_ENCODE_HANDLER
+jwt_response_payload_handler    = api_settings.JWT_RESPONSE_PAYLOAD_HANDLER
 
-    def post(self, request, *args, **kwargs):
-        serializer = self.serializer_class(data=request.data,
-        context={'request': request})
-        serializer.is_valid(raise_exception=True)
-        user = serializer.validated_data['user']
-        # if not user.is_verified:
-        #     return Response({
-        #             "errors": "Please check your inbox for verification link"
-        #         }, status=status.HTTP_400_BAD_REQUEST)
 
-        token, created = Token.objects.get_or_create(user=user)
-        return Response({
-            "token": token.key,
-            "user" : {
-                # "user_id": user.pk,
-                "id":user.pk,
-                # "space_admin": user_space.is_space_admin,
-                # "space_type": user.space_type.id,
-                "username": user.username,
-                "email": user.email
-            }
-        })
+# class CustomAuthToken(views.ObtainAuthToken):
 
-class RegistrationAPIView(APIView):
+#     def post(self, request, *args, **kwargs):
+#         serializer = self.serializer_class(data=request.data,
+#         context={'request': request})
+#         serializer.is_valid(raise_exception=True)
+#         user = serializer.validated_data['user']
+#         # if not user.is_verified:
+#         #     return Response({
+#         #             "errors": "Please check your inbox for verification link"
+#         #         }, status=status.HTTP_400_BAD_REQUEST)
+
+#         token, created = Token.objects.get_or_create(user=user)
+#         return Response({
+#             "token": token.key,
+#             "user" : {
+#                 # "user_id": user.pk,
+#                 "id":user.pk,
+#                 # "space_admin": user_space.is_space_admin,
+#                 # "space_type": user.space_type.id,
+#                 "username": user.username,
+#                 "email": user.email
+#             }
+#         })
+
+class RegistrationAPIView(generics.CreateAPIView):
     # Allow any user (authenticated or not) to hit this endpoint.
+    # queryset = User.objects.all()
     permission_classes = (AllowAny,)
     # renderer_classes = (UserJSONRenderer,)
     serializer_class = RegistrationSerializer
@@ -65,20 +74,19 @@ class RegistrationAPIView(APIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-class RegisterArtistAPIView(APIView):
-    # Allow any user (authenticated or not) to hit this endpoint.
+class RegisterArtistAPIView(generics.CreateAPIView):
     permission_classes = (AllowAny,)
     # renderer_classes = (UserJSONRenderer,)
     serializer_class = RegisterArtistSerializer
 
     def post(self, request):
         # user = request.data.get('user', {})
-        # serializer = self.serializer_class(data=request.data)
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
 
 class RegisterRecordLabelAPIView(APIView):
     # Allow any user (authenticated or not) to hit this endpoint.
@@ -145,20 +153,44 @@ class UserView(viewsets.ModelViewSet):
 
 #         return Response(serializer.data, status=status.HTTP_200_OK)
 
+class AuthAPIView(APIView):
+    permission_classes      = (AllowAny,)
+
+    def post(self, request, *args, **kwargs):
+        #print(request.user)
+        # if request.user.is_authenticated():
+        #     return Response({'detail': 'You are already authenticated'}, status=400)
+        data = request.data
+        username = data.get('username') # username or email address
+        password = data.get('password')
+        qs = User.objects.filter(
+                Q(username__iexact=username)|
+                Q(email__iexact=username)
+            ).distinct()
+        if qs.count() == 1:
+            user_obj = qs.first()
+            if user_obj.check_password(password):
+                user = user_obj
+                payload = jwt_payload_handler(user)
+                token = jwt_encode_handler(payload)
+                response = jwt_response_payload_handler(token, user, request=request)
+                return Response(response)
+        return Response({"detail": "Invalid credentials"}, status=401)
 
 
-# class LoginAPIView(APIView):
-#     permission_classes = (AllowAny,)
-#     # renderer_classes = (UserJSONRenderer,)
-#     serializer_class = LoginSerializer
 
-#     def post(self, request):
-#         # user = request.data.get('user', {})
-#         # serializer = self.serializer_class(data=user)
-#         serializer = self.serializer_class(data=request.data)
-#         serializer.is_valid(raise_exception=True)
+class LoginAPIView(APIView):
+    permission_classes = (AllowAny,)
+    # renderer_classes = (UserJSONRenderer,)
+    serializer_class = LoginSerializer
 
-#         return Response(serializer.data, status=status.HTTP_200_OK)
+    def post(self, request):
+        # user = request.data.get('user', {})
+        # serializer = self.serializer_class(data=user)
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 # class UserView(viewsets.ModelViewSet):
 #     queryset   = User.objects.all()

@@ -14,9 +14,24 @@ from . models import(
 
 
 
-
 class RegistrationSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(required=True,min_length=8)
+    password = serializers.CharField(required=True,min_length=8, write_only=True)
+    # password2 = serializers.CharField(required=True,min_length=8)
+    token = serializers.CharField(max_length=255, read_only=True)
+
+    class Meta:
+        model  = User 
+        fields = ("id", "username", "email", "password", "token")
+        read_only_field = ("created_at", "updated_at")
+
+    def create(self, validated_data):
+        # Use the `create_user` method we wrote earlier to create a new user.
+        return User.objects.create_user(**validated_data)
+
+
+
+class RegisterArtistSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(required=True,min_length=8, write_only=True)
     token = serializers.CharField(max_length=255, read_only=True)
 
     class Meta:
@@ -29,21 +44,34 @@ class RegistrationSerializer(serializers.ModelSerializer):
         # Use the `create_user` method we wrote earlier to create a new user.
         return User.objects.create_user(**validated_data)
 
+class ArtistProfileSerializer(serializers.ModelSerializer):
+    # user = UserSerializer();
+    class Meta:
+        model  = ArtistProfile
+        fields = "__all__"
+        # fields = ("id", "username", "email")
+        read_only_fields = ("created_at", "updated_at")
 
+        
 class LoginSerializer(serializers.Serializer):
-    email = serializers.CharField(max_length=255)
+    # email = serializers.CharField(max_length=255)
     username = serializers.CharField(max_length=255, read_only=True)
     password = serializers.CharField(max_length=128, write_only=True)
     token = serializers.CharField(max_length=255, read_only=True)
 
     def validate(self, data):
-        
-        email = data.get('email', None)
+        username = data.get('username', None)
+        # email = data.get('email', None)
         password = data.get('password', None)
 
-        if email is None:
+        # if email is None:
+        #     raise serializers.ValidationError(
+        #         'An email address is required to log in.'
+        #     )
+
+        if username is None:
             raise serializers.ValidationError(
-                'An email address is required to log in.'
+                'A username address is required to log in.'
             )
 
         if password is None:
@@ -51,7 +79,7 @@ class LoginSerializer(serializers.Serializer):
                 'A password is required to log in.'
             )
 
-        user = authenticate(username=email, password=password)
+        user = authenticate(username=username, password=password)
 
         if user is None:
             raise serializers.ValidationError(
@@ -65,10 +93,17 @@ class LoginSerializer(serializers.Serializer):
             )
 
         return {
-            'email': user.email,
+            # 'email': user.email,
             'username': user.username,
+            'password':user.password,
             'token': user.token
         }
+
+        # return {
+        #     'email': user.email,
+        #     'username': user.username,
+        #     'token': user.token
+        # }
         
 
 # class UserSerializer(serializers.ModelSerializer):
@@ -111,32 +146,26 @@ class ProfileSerializer(serializers.ModelSerializer):
         # fields = ("id", "username", "email")
         read_only_fields = ("created_on", "updated_on")
 
-class ArtistProfileSerializer(serializers.ModelSerializer):
-    # user = UserSerializer();
-    class Meta:
-        model  = ArtistProfile
-        fields = "__all__"
-        # fields = ("id", "username", "email")
-        read_only_fields = ("created_at", "updated_at")
+
 
     
         
-class RegisterArtistSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(required=True,min_length=8)
-    token = serializers.CharField(max_length=255, read_only=True)
-    # artist_profile = ArtistProfileSerializer(required=False)
-    # artist_profile = ArtistProfileSerializer(required=False)
-    # userprofile = UserProfileSerializer(required=False)
+# class RegisterArtistSerializer(serializers.ModelSerializer):
+#     password = serializers.CharField(required=True,min_length=8, write_only=True)
+#     token = serializers.CharField(max_length=255, read_only=True)
+#     # artist_profile = ArtistProfileSerializer(required=False)
+#     # artist_profile = ArtistProfileSerializer(required=False)
+#     # userprofile = UserProfileSerializer(required=False)
 
-    class Meta:
-        model  = User 
-        fields = ("id", "username", "email", "password", "token")
-        # fields = "__all__"
-        read_only_field = ("created_at", "updated_at")
+#     class Meta:
+#         model  = User 
+#         fields = ("id", "username", "email", "password", "token")
+#         # fields = "__all__"
+#         read_only_field = ("created_at", "updated_at")
 
-    def create(self, validated_data):
-        # Use the `create_user` method we wrote earlier to create a new user.
-        return User.objects.create_user(**validated_data)
+#     def create(self, validated_data):
+#         # Use the `create_user` method we wrote earlier to create a new user.
+#         return User.objects.create_user(**validated_data)
 
 
     # def create(self, validated_data):
@@ -162,7 +191,7 @@ class RegisterArtistSerializer(serializers.ModelSerializer):
 
 
 class RegisterRecordLabelSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(required=True,min_length=8)
+    password = serializers.CharField(required=True,min_length=8, write_only=True)
     token = serializers.CharField(max_length=255, read_only=True)
 
     class Meta:
@@ -178,7 +207,7 @@ class RegisterRecordLabelSerializer(serializers.ModelSerializer):
 
 
 class RegisterManagerSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(required=True,min_length=8)
+    password = serializers.CharField(required=True,min_length=8, write_only=True)
     token = serializers.CharField(max_length=255, read_only=True)
 
     class Meta:

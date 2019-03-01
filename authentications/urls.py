@@ -4,9 +4,10 @@ from . import views, const_views
 from rest_framework import routers
 
 from .views import (
-    # LoginAPIView,
+    LoginAPIView,
     RegistrationAPIView,
     RegisterArtistAPIView,
+    AuthAPIView,
     RegisterRecordLabelAPIView,
     RegisterManagerAPIView,
     #     UserRetrieveUpdateAPIView,
@@ -25,16 +26,16 @@ router.register('user', views.UserView)
 # router.register('profile', views.ProfileView)
 
 urlpatterns = [
-    # url(r'^login/?$', views.CustomAuthToken.as_view()),
-    path('login/', views.CustomAuthToken.as_view()),
-    #path('login/', LoginAPIView.as_view()),
+    path('login/', AuthAPIView.as_view()),
+#     path('login/', views.CustomAuthToken.as_view()),
+    # path('login/', LoginAPIView.as_view()),
     path('register/', RegistrationAPIView.as_view()),
     #     path('user/', UserRetrieveUpdateAPIView.as_view()),
     # url('member/user/?$', views.UserDefaultMemberView.as_view()),
     # url('artist/?$', views.GetUserArtistMemberView.as_view()),
     # url('manager/?$', views.GetUserRecordMemberView.as_view()),
 
-    url('register/artist/?$', RegisterArtistAPIView.as_view()),
+    path('register/artist/', RegisterArtistAPIView.as_view()),
     url('register/record_label/?$', RegisterRecordLabelAPIView.as_view()),
     url('register/manager/?$', RegisterManagerAPIView.as_view()),
 
