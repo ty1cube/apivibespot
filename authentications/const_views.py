@@ -25,9 +25,9 @@ class LocalAreaView(views.APIView):
     permission_classes = (permissions.AllowAny,)
 
     def get(self, request, format=None):
-        # object = const_models.LocalArea.objects.all()
+       object = const_models.LocalArea.objects.all()
         # object = const_models.LocalArea.objects.filter(localareaview_set__state__id=id)
-        object = State.objects.filter(state=request.GET['state_id'])
+        # object = State.objects.filter(state=request.GET['state_id'])
 
         serializer = const_serializers.LocalAreaSerializer(object, many=True)
         return Response(serializer.data)
