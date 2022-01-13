@@ -19,7 +19,7 @@ MarkupSafe==1.1.0
 mysql-connector-python==8.0.14
 mysqlclient==1.3.12
 pbr==5.1.1
-Pillow==5.4.1
+Pillow==9.0.0
 protobuf==3.6.1
 PyJWT==1.7.1
 python-dateutil==2.7.5
